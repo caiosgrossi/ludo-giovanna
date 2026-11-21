@@ -1,0 +1,21 @@
+{
+  "rules": {
+    ".read": false,
+    ".write": false,
+    "rooms": {
+      "caio-e-giovanna": {
+        ".read": true,
+        "state": {
+          ".write": true,
+          ".validate": "newData.hasChildren(['p', 't', 'seq', 'ph'])"
+        },
+        "online": {
+          "$seat": {
+            ".write": "$seat === '0' || $seat === '1'",
+            ".validate": "newData.isBoolean()"
+          }
+        }
+      }
+    }
+  }
+}

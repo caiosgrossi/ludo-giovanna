@@ -1,0 +1,377 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Para a Giovanna ♥ Ludo</title>
+<script src="config.js"></script>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=Fraunces:ital,wght@0,500;0,700;1,400&family=Nunito:wght@500;700;800&display=swap" rel="stylesheet">
+<style>
+  :root{
+    --g:#e5487f; --g2:#ffd3e2; --c:#3b7dd8; --c2:#d4e4fb;
+    --l:#c9b8e8; --m:#a9dcc2; --ink:#3a2433; --bg:#fff5f8;
+  }
+  *{box-sizing:border-box}
+  html,body{margin:0;min-height:100%;background:radial-gradient(circle at 20% 0%,#ffe1ec 0,var(--bg) 45%,#f3ecff 100%);color:var(--ink);font-family:Nunito,system-ui,sans-serif}
+  .screen{display:none;min-height:100vh;padding:24px 16px;align-items:center;justify-content:center;flex-direction:column}
+  .screen.on{display:flex}
+  .card{background:#fff;border-radius:22px;box-shadow:0 12px 40px rgba(229,72,127,.18);padding:28px 26px;max-width:560px;width:100%}
+  h1{font-family:Fraunces,serif;font-weight:700;margin:0 0 6px;font-size:2rem;color:var(--g)}
+  .letter p{font-family:Fraunces,serif;font-size:1.08rem;line-height:1.6;margin:0 0 14px}
+  .letter .sig{text-align:right;font-style:italic}
+  .hearts{position:fixed;inset:0;pointer-events:none;overflow:hidden;z-index:0}
+  .hearts span{position:absolute;bottom:-30px;color:var(--g);opacity:.25;animation:up linear infinite}
+  @keyframes up{to{transform:translateY(-115vh) rotate(25deg)}}
+  .card,.game{position:relative;z-index:1}
+  button{font-family:inherit;font-weight:800;font-size:1rem;border:0;border-radius:14px;padding:13px 20px;cursor:pointer;transition:transform .12s, box-shadow .12s}
+  button:active{transform:scale(.97)}
+  button:disabled{opacity:.45;cursor:not-allowed}
+  .primary{background:var(--g);color:#fff;box-shadow:0 6px 16px rgba(229,72,127,.35)}
+  .ghost{background:#f4eef3;color:var(--ink)}
+  .row{display:flex;gap:10px;flex-wrap:wrap;margin-top:14px}
+  .row button{flex:1;min-width:140px}
+  .muted{color:#8b6d7f;font-size:.92rem}
+  .opt{border:2px solid #f1dbe5;border-radius:16px;padding:16px;margin-top:14px}
+  .opt h3{margin:0 0 4px;font-size:1.1rem}
+  .seat-g{background:var(--g);color:#fff}
+  .seat-c{background:var(--c);color:#fff}
+  .dot{display:inline-block;width:9px;height:9px;border-radius:50%;background:#ccc;margin-right:6px;vertical-align:middle}
+  .dot.on{background:#3cc47c}
+
+  .game{width:100%;max-width:620px;display:flex;flex-direction:column;align-items:center;gap:12px}
+  .top{display:flex;justify-content:space-between;align-items:center;width:100%;gap:8px}
+  .pill{padding:8px 12px;border-radius:999px;font-weight:800;font-size:.92rem;display:flex;align-items:center;gap:6px;background:#fff;box-shadow:0 2px 8px rgba(0,0,0,.06);border:3px solid transparent}
+  .pill.g{color:var(--g)} .pill.c{color:var(--c)}
+  .pill.active.g{border-color:var(--g)} .pill.active.c{border-color:var(--c)}
+  .boardwrap{position:relative;width:min(94vw,64vh,600px);aspect-ratio:1;border-radius:16px;overflow:hidden;box-shadow:0 10px 30px rgba(58,36,51,.18);background:#fff}
+  .boardwrap svg{position:absolute;inset:0;width:100%;height:100%}
+  .tok{position:absolute;width:5.2%;height:5.2%;border-radius:50%;transform:translate(-50%,-50%);transition:left .35s ease, top .35s ease, box-shadow .2s;border:2.5px solid #fff;box-shadow:0 2px 5px rgba(0,0,0,.35);display:flex;align-items:center;justify-content:center;color:#fff;font-size:min(2.2vw,13px);font-weight:800;z-index:2}
+  .tok.g{background:radial-gradient(circle at 35% 30%,#ff8db4,var(--g))}
+  .tok.c{background:radial-gradient(circle at 35% 30%,#7fb2f5,var(--c))}
+  .tok.can{cursor:pointer;z-index:3;animation:pulse 0.9s ease-in-out infinite}
+  @keyframes pulse{0%,100%{box-shadow:0 0 0 0 rgba(255,200,0,.9),0 2px 5px rgba(0,0,0,.35)}50%{box-shadow:0 0 0 6px rgba(255,200,0,.0),0 2px 5px rgba(0,0,0,.35)}}
+  .controls{display:flex;align-items:center;gap:14px;width:100%;justify-content:center}
+  .die{width:70px;height:70px;border-radius:16px;background:#fff;box-shadow:0 4px 14px rgba(0,0,0,.15);display:grid;grid-template:repeat(3,1fr)/repeat(3,1fr);padding:10px;cursor:pointer;border:3px solid transparent}
+  .die.ready{border-color:#ffc400;animation:bob 1s ease-in-out infinite}
+  @keyframes bob{50%{transform:translateY(-3px)}}
+  .die.rolling{animation:spin .5s linear}
+  @keyframes spin{to{transform:rotate(360deg)}}
+  .pip{width:12px;height:12px;border-radius:50%;background:var(--ink);place-self:center;visibility:hidden}
+  .pip.v{visibility:visible}
+  #status{font-weight:800;font-size:1.05rem;text-align:center;min-height:1.4em}
+  #sub{text-align:center;min-height:1.2em}
+  .bar{display:flex;gap:8px;flex-wrap:wrap;justify-content:center}
+  .bar button{padding:8px 14px;font-size:.88rem}
+  .modal{position:fixed;inset:0;background:rgba(58,36,51,.45);display:none;align-items:center;justify-content:center;z-index:10;padding:16px}
+  .modal.on{display:flex}
+  .modal .card{text-align:center}
+  .big{font-size:3rem;line-height:1}
+</style>
+</head>
+<body>
+<div class="hearts" id="hearts"></div>
+
+<!-- 1. Carta -->
+<section class="screen on" id="s-letter">
+  <div class="card letter">
+    <h1>Giovanna,</h1>
+    <p>Eu sei que errei, e não vou fingir que não. Você merece ser cuidada com o mesmo carinho que você cuida de todo mundo, e dessa vez eu falhei nisso. Me desculpa, de coração.</p>
+    <p>Não fiz esse site pra apagar o que aconteceu. Fiz pra te mostrar que eu penso em você o tempo todo e que eu quero fazer melhor. Você é a minha pessoa favorita no mundo, e ficar brigado com você é o pior jogo que existe.</p>
+    <p>Então te proponho um outro: uma partida de Ludo, eu contra você. Se você ganhar, te devo um date à sua escolha. Se eu ganhar… te devo um date à sua escolha também. Porque no fim quem ganha sou eu, por ter você.</p>
+    <p>Te amo.</p>
+    <p class="sig">— Caio</p>
+    <div class="row"><button class="primary" id="b-accept">Aceito o desafio ♥</button></div>
+  </div>
+</section>
+
+<!-- 2. Modo -->
+<section class="screen" id="s-mode">
+  <div class="card">
+    <h1>Como vamos jogar?</h1>
+    <div class="opt">
+      <h3>Online, cada um no seu aparelho</h3>
+      <div class="muted" id="net-info">Conectando…</div>
+      <div class="muted" style="margin-top:6px"><span class="dot" id="d-g"></span>Giovanna &nbsp; <span class="dot" id="d-c"></span>Caio</div>
+      <div class="row">
+        <button class="seat-g" id="b-seat-g" disabled>Sou a Giovanna</button>
+        <button class="seat-c" id="b-seat-c" disabled>Sou o Caio</button>
+      </div>
+    </div>
+    <div class="opt">
+      <h3>No mesmo aparelho</h3>
+      <div class="muted">Vocês revezam no mesmo celular ou computador.</div>
+      <div class="row"><button class="ghost" id="b-local">Jogar juntinhos</button></div>
+    </div>
+    <div class="row"><button class="ghost" id="b-back">← Reler a carta</button></div>
+  </div>
+</section>
+
+<!-- 3. Jogo -->
+<section class="screen" id="s-game">
+  <div class="game">
+    <div class="top">
+      <div class="pill g" id="p-g"><span class="dot" id="pd-g"></span>Giovanna <span id="sc-g">0/4</span></div>
+      <div class="pill c" id="p-c"><span class="dot" id="pd-c"></span>Caio <span id="sc-c">0/4</span></div>
+    </div>
+    <div class="boardwrap" id="board"></div>
+    <div id="status"></div>
+    <div class="controls">
+      <div class="die" id="die"></div>
+    </div>
+    <div class="muted" id="sub"></div>
+    <div class="bar">
+      <button class="ghost" id="b-new">Novo jogo</button>
+      <button class="ghost" id="b-rules">Regras</button>
+      <button class="ghost" id="b-letter">♥ Carta</button>
+    </div>
+  </div>
+</section>
+
+<div class="modal" id="m-win"><div class="card"><div class="big" id="w-icon">♥</div><h1 id="w-title"></h1><p id="w-text" style="font-family:Fraunces,serif;font-size:1.1rem;line-height:1.5"></p><div class="row"><button class="primary" id="b-again">Jogar de novo</button></div></div></div>
+<div class="modal" id="m-rules"><div class="card"><h1>Regras</h1>
+  <p style="text-align:left;line-height:1.55">• Tire <b>6</b> para tirar uma peça da casinha.<br>• Tirou 6, capturou uma peça ou chegou ao centro: joga de novo.<br>• Cair numa casa com peça do outro manda ela de volta pra casinha, exceto nas casas seguras (★ e casas de saída).<br>• Para entrar no centro precisa do número exato.<br>• Ganha quem levar as 4 peças ao centro primeiro.</p>
+  <div class="row"><button class="primary" id="b-rules-ok">Entendi</button></div></div></div>
+
+<script>
+(() => {
+// ---------- hearts background ----------
+const H = document.getElementById('hearts');
+for (let i=0;i<16;i++){const s=document.createElement('span');s.textContent='♥';s.style.left=Math.random()*100+'%';s.style.fontSize=(12+Math.random()*22)+'px';s.style.animationDuration=(10+Math.random()*14)+'s';s.style.animationDelay=(-Math.random()*20)+'s';H.appendChild(s);}
+
+// ---------- geometry ----------
+const TRACK=[];
+const push=(r,c)=>TRACK.push([r,c]);
+for(let c=1;c<=5;c++)push(6,c);
+for(let r=5;r>=0;r--)push(r,6);
+push(0,7);push(0,8);
+for(let r=1;r<=5;r++)push(r,8);
+for(let c=9;c<=14;c++)push(6,c);
+push(7,14);push(8,14);
+for(let c=13;c>=9;c--)push(8,c);
+for(let r=9;r<=14;r++)push(r,8);
+push(14,7);push(14,6);
+for(let r=13;r>=9;r--)push(r,6);
+for(let c=5;c>=0;c--)push(8,c);
+push(7,0);push(6,0);
+const SAFE=new Set([0,8,13,21,26,34,39,47]);
+const NAMES=['Giovanna','Caio'], KEY=['g','c'];
+const SLOT=[0,2]; // Giovanna top-left, Caio bottom-right
+const ORIG=[[0,0],[0,9],[9,9],[9,0]];
+const SPOTS=[[2,2],[2,4],[4,2],[4,4]];
+
+function coord(pl,i,pos){
+  const s=SLOT[pl];
+  if(pos<0){const o=ORIG[s];return [o[0]+SPOTS[i][0],o[1]+SPOTS[i][1]];}
+  if(pos<=50){const [r,c]=TRACK[(pos+s*13)%52];return [r+.5,c+.5];}
+  if(pos<=55){const k=pos-50;return s===0?[7.5,k+.5]:[7.5,14-k+.5];}
+  const dx=[-.35,.35,-.35,.35][i]*.8, dy=[-.35,-.35,.35,.35][i]*.8;
+  return s===0?[7.5+dy,6.7+dx*.6]:[7.5+dy,8.3+dx*.6];
+}
+const absOf=(pl,pos)=>(pos+SLOT[pl]*13)%52;
+
+// ---------- board svg ----------
+function drawBoard(){
+  const col=['#e5487f','#c9b8e8','#3b7dd8','#a9dcc2'];
+  const light=['#ffe0eb','#f1eafb','#e0ecfd','#e5f6ed'];
+  let s='<svg viewBox="0 0 15 15" xmlns="http://www.w3.org/2000/svg">';
+  s+='<rect width="15" height="15" fill="#fff"/>';
+  ORIG.forEach((o,q)=>{
+    s+=`<rect x="${o[1]}" y="${o[0]}" width="6" height="6" fill="${col[q]}"/>`;
+    s+=`<rect x="${o[1]+.8}" y="${o[0]+.8}" width="4.4" height="4.4" rx=".6" fill="#fff"/>`;
+    if(q===0||q===2) SPOTS.forEach(p=>{s+=`<circle cx="${o[1]+p[1]}" cy="${o[0]+p[0]}" r=".62" fill="${light[q]}" stroke="${col[q]}" stroke-width=".08"/>`;});
+    else s+=`<text x="${o[1]+3}" y="${o[0]+3.45}" text-anchor="middle" font-size="1.3" fill="${col[q]}" font-family="Fraunces,serif" font-weight="700">${q===1?'G ♥ C':'♥'}</text>`;
+  });
+  TRACK.forEach(([r,c],a)=>{
+    let f='#fff';
+    if(a===0)f=col[0]; if(a===13)f=col[1]; if(a===26)f=col[2]; if(a===39)f=col[3];
+    s+=`<rect x="${c}" y="${r}" width="1" height="1" fill="${f}" stroke="#d9c9d2" stroke-width=".04"/>`;
+    if(SAFE.has(a)&&a%13!==0)s+=`<text x="${c+.5}" y="${r+.74}" text-anchor="middle" font-size=".7" fill="#d4a017">★</text>`;
+  });
+  for(let k=1;k<=5;k++){
+    s+=`<rect x="${k}" y="7" width="1" height="1" fill="${col[0]}" stroke="#fff" stroke-width=".04"/>`;
+    s+=`<rect x="7" y="${k}" width="1" height="1" fill="${col[1]}" stroke="#fff" stroke-width=".04"/>`;
+    s+=`<rect x="${14-k}" y="7" width="1" height="1" fill="${col[2]}" stroke="#fff" stroke-width=".04"/>`;
+    s+=`<rect x="7" y="${14-k}" width="1" height="1" fill="${col[3]}" stroke="#fff" stroke-width=".04"/>`;
+  }
+  s+=`<polygon points="6,6 6,9 7.5,7.5" fill="${col[0]}"/><polygon points="6,6 9,6 7.5,7.5" fill="${col[1]}"/><polygon points="9,6 9,9 7.5,7.5" fill="${col[2]}"/><polygon points="6,9 9,9 7.5,7.5" fill="${col[3]}"/>`;
+  s+=`<text x="7.5" y="7.82" text-anchor="middle" font-size=".9" fill="#fff">♥</text>`;
+  s+='</svg>';
+  document.getElementById('board').innerHTML=s;
+  for(let pl=0;pl<2;pl++)for(let i=0;i<4;i++){
+    const t=document.createElement('div');t.className='tok '+KEY[pl];t.id=`t${pl}${i}`;t.textContent=pl===0?'G':'C';
+    t.addEventListener('click',()=>onToken(pl,i));
+    document.getElementById('board').appendChild(t);
+  }
+}
+
+// ---------- state ----------
+const fresh=(seq=0)=>({p:[[-1,-1,-1,-1],[-1,-1,-1,-1]],t:0,d:0,ph:'roll',w:-1,msg:'',seq,ts:Date.now()});
+let S=fresh();
+let mode=null, mySeat=null, rolling=false;
+try{const sv=JSON.parse(localStorage.getItem('ludo-gc-local')||'null');if(sv&&sv.p)S=sv;}catch(e){}
+let localSaved=S;
+
+const myTurn=()=>S.w<0&&(mode==='local'||S.t===mySeat);
+const canMove=(pl,i,d)=>{const pos=S.p[pl][i];if(pos===56)return false;if(pos<0)return d===6;return pos+d<=56;};
+const movable=()=>[0,1,2,3].filter(i=>canMove(S.t,i,S.d));
+
+function commit(){
+  S.seq=(S.seq||0)+1; S.ts=Date.now();
+  if(mode==='local'){localSaved=S;try{localStorage.setItem('ludo-gc-local',JSON.stringify(S));}catch(e){}}
+  if(mode==='online')pushOnline();
+  render();
+}
+
+function roll(){
+  if(!myTurn()||S.ph!=='roll'||rolling)return;
+  rolling=true;
+  const die=document.getElementById('die');die.classList.add('rolling');
+  let n=0;const iv=setInterval(()=>{drawDie(1+Math.floor(Math.random()*6));if(++n>6)clearInterval(iv);},65);
+  setTimeout(()=>{
+    die.classList.remove('rolling');rolling=false;
+    const d=1+Math.floor(Math.random()*6);
+    S.d=d;
+    const mv=[0,1,2,3].filter(i=>canMove(S.t,i,d));
+    if(!mv.length){S.msg=`${NAMES[S.t]} tirou ${d} e não tem jogada.`;S.t=1-S.t;S.ph='roll';commit();return;}
+    S.ph='move';S.msg='';commit();
+    // auto-move if every option is the same move
+    const uniq=new Set(mv.map(i=>S.p[S.t][i]));
+    if(uniq.size===1)setTimeout(()=>{if(S.ph==='move'&&myTurn())doMove(mv[0]);},450);
+  },520);
+}
+
+function onToken(pl,i){
+  if(!myTurn()||S.ph!=='move'||pl!==S.t||!canMove(pl,i,S.d))return;
+  doMove(i);
+}
+
+function doMove(i){
+  const pl=S.t,d=S.d;let pos=S.p[pl][i];
+  pos=pos<0?0:pos+d;S.p[pl][i]=pos;
+  let cap=false;
+  if(pos<=50){const a=absOf(pl,pos);
+    if(!SAFE.has(a)){const op=1-pl;S.p[op]=S.p[op].map(q=>{if(q>=0&&q<=50&&absOf(op,q)===a){cap=true;return -1;}return q;});}}
+  const home=pos===56;
+  S.msg=home?`${NAMES[pl]} levou uma peça pro centro ♥`:'';
+  if(cap)S.msg=pl===0?'A Giovanna capturou o Caio! Bem feito pra ele.':'O Caio capturou… desculpa, amor!';
+  if(S.p[pl].every(q=>q===56)){S.w=pl;S.ph='roll';commit();return;}
+  if(!(d===6||cap||home))S.t=1-pl;
+  S.ph='roll';commit();
+}
+
+// ---------- render ----------
+const PIPS={1:[4],2:[0,8],3:[0,4,8],4:[0,2,6,8],5:[0,2,4,6,8],6:[0,2,3,5,6,8]};
+function drawDie(v){const el=document.getElementById('die');el.innerHTML='';for(let k=0;k<9;k++){const p=document.createElement('div');p.className='pip'+((PIPS[v]||[]).includes(k)?' v':'');el.appendChild(p);}}
+
+function render(){
+  if(!document.getElementById('t00'))return;
+  const mv=S.ph==='move'&&myTurn()?movable():[];
+  for(let pl=0;pl<2;pl++){
+    const groups={};
+    for(let i=0;i<4;i++){const k=S.p[pl][i];if(k>=0&&k<56)(groups[k]=groups[k]||[]).push(i);}
+    for(let i=0;i<4;i++){
+      let [y,x]=coord(pl,i,S.p[pl][i]);
+      const g=groups[S.p[pl][i]];
+      if(g&&g.length>1){const j=g.indexOf(i);x+=(j-(g.length-1)/2)*.28;y-=.08*j;}
+      // shift if opponent on same cell
+      const t=document.getElementById(`t${pl}${i}`);
+      t.style.left=(x/15*100)+'%';t.style.top=(y/15*100)+'%';
+      t.classList.toggle('can',pl===S.t&&mv.includes(i));
+    }
+  }
+  // overlap between players on safe squares
+  drawDie(S.d||6);
+  const die=document.getElementById('die');
+  die.classList.toggle('ready',myTurn()&&S.ph==='roll'&&!rolling);
+  ['g','c'].forEach((k,pl)=>{
+    document.getElementById('p-'+k).classList.toggle('active',S.w<0&&S.t===pl);
+    document.getElementById('sc-'+k).textContent=S.p[pl].filter(q=>q===56).length+'/4';
+  });
+  const who=NAMES[S.t];
+  let st='';
+  if(S.w>=0)st=`${NAMES[S.w]} venceu!`;
+  else if(mode==='online')st=S.t===mySeat?(S.ph==='roll'?'Sua vez: jogue o dado':`Tirou ${S.d}: escolha uma peça`):`Vez ${S.t===0?'da':'do'} ${who}…`;
+  else st=`Vez ${S.t===0?'da':'do'} ${who}: `+(S.ph==='roll'?'jogue o dado':`tirou ${S.d}, escolha uma peça`);
+  document.getElementById('status').textContent=st;
+  document.getElementById('status').style.color=S.w>=0?'var(--ink)':(S.t===0?'var(--g)':'var(--c)');
+  document.getElementById('sub').textContent=S.msg||'';
+  // presence dots
+  const on=onlineSeats();
+  document.getElementById('pd-g').classList.toggle('on',mode==='local'||on[0]);
+  document.getElementById('pd-c').classList.toggle('on',mode==='local'||on[1]);
+  document.getElementById('pd-g').style.display=document.getElementById('pd-c').style.display=mode==='online'?'':'none';
+  // win modal
+  const m=document.getElementById('m-win');
+  if(S.w>=0){
+    m.classList.add('on');
+    if(S.w===0){document.getElementById('w-title').textContent='Você ganhou, Giovanna!';document.getElementById('w-text').textContent='Ganhou o jogo e o date à sua escolha. Meu coração você já tinha ganhado faz tempo. Me perdoa?';}
+    else{document.getElementById('w-title').textContent='O Caio ganhou…';document.getElementById('w-text').textContent='Ganhei no Ludo, mas quem manda aqui é você. O date à sua escolha continua de pé. Me perdoa?';}
+  } else m.classList.remove('on');
+}
+
+// ---------- online (Firebase Realtime Database) ----------
+const FBV='https://www.gstatic.com/firebasejs/10.12.2/';
+let fb=null, onlineMap={}, remote=null, fbConnected=false;
+function onlineSeats(){return [!!onlineMap['0'],!!onlineMap['1']];}
+function norm(v){v.msg=v.msg||'';v.d=v.d||0;v.p=[0,1].map(k=>[0,1,2,3].map(i=>(v.p&&v.p[k]&&v.p[k][i]!=null)?v.p[k][i]:-1));return v;}
+function updateLobby(){
+  const on=onlineSeats();
+  document.getElementById('d-g').classList.toggle('on',on[0]);
+  document.getElementById('d-c').classList.toggle('on',on[1]);
+  render();
+}
+function markOnline(){
+  if(!fb||mySeat==null)return;
+  const r=fb.d.ref(fb.db,fb.base+'/online/'+mySeat);
+  fb.d.onDisconnect(r).remove().then(()=>fb.d.set(r,true)).catch(()=>{});
+}
+async function initRoom(){
+  const info=document.getElementById('net-info');
+  const cfg=window.FIREBASE_CONFIG||{};
+  const room=(window.ROOM||'caio-e-giovanna').replace(/[^a-z0-9-]/gi,'');
+  if(!cfg.apiKey||/COLE/i.test(cfg.apiKey)){info.textContent='Modo online ainda não configurado (falta o firebaseConfig em config.js). Joguem no mesmo aparelho abaixo.';return;}
+  try{
+    const app=await import(FBV+'firebase-app.js');
+    const d=await import(FBV+'firebase-database.js');
+    const db=d.getDatabase(app.initializeApp(cfg));
+    fb={d,db,base:'rooms/'+room};
+    d.onValue(d.ref(db,'.info/connected'),snap=>{fbConnected=!!snap.val();if(fbConnected)markOnline();info.textContent=fbConnected?'Abram este site cada um no seu aparelho e escolham quem são.':'Conectando…';});
+    d.onValue(d.ref(db,fb.base+'/online'),snap=>{onlineMap=snap.val()||{};updateLobby();});
+    d.onValue(d.ref(db,fb.base+'/state'),snap=>{
+      const v=snap.val();remote=v&&v.p?norm(v):null;
+      if(remote&&mode==='online'&&remote.seq>=S.seq){S=JSON.parse(JSON.stringify(remote));render();}
+    },err=>{info.textContent='Sem permissão no banco do Firebase. Confira as regras.';});
+    document.getElementById('b-seat-g').disabled=false;
+    document.getElementById('b-seat-c').disabled=false;
+  }catch(e){info.textContent='Não deu pra conectar online. Joguem no mesmo aparelho abaixo.';console.error(e);}
+}
+function pushOnline(){if(fb)fb.d.set(fb.d.ref(fb.db,fb.base+'/state'),S).catch(e=>{document.getElementById('sub').textContent='Erro ao salvar online: '+e.message;});}
+
+// ---------- navigation ----------
+const show=id=>{document.querySelectorAll('.screen').forEach(s=>s.classList.toggle('on',s.id===id));window.scrollTo(0,0);};
+document.getElementById('b-accept').onclick=()=>show(mode?'s-game':'s-mode');
+document.getElementById('b-back').onclick=()=>show('s-letter');
+document.getElementById('b-letter').onclick=()=>show('s-letter');
+function startOnline(seat){
+  mode='online';mySeat=seat;
+  if(remote){S=JSON.parse(JSON.stringify(remote));}else{S=fresh();pushOnline();}
+  markOnline();show('s-game');render();
+}
+document.getElementById('b-seat-g').onclick=()=>startOnline(0);
+document.getElementById('b-seat-c').onclick=()=>startOnline(1);
+document.getElementById('b-local').onclick=()=>{mode='local';mySeat=null;S=localSaved;show('s-game');render();};
+document.getElementById('die').onclick=roll;
+function newGame(){S=fresh(S.seq);commit();}
+document.getElementById('b-new').onclick=()=>{if(mode==='online'&&S.w<0&&S.p.some(a=>a.some(q=>q>=0))){if(!confirmBox())return;}newGame();};
+let confirmArmed=0;
+function confirmBox(){const b=document.getElementById('b-new');if(Date.now()-confirmArmed<3000){b.textContent='Novo jogo';return true;}confirmArmed=Date.now();b.textContent='Toque de novo p/ confirmar';setTimeout(()=>b.textContent='Novo jogo',3000);return false;}
+document.getElementById('b-again').onclick=newGame;
+document.getElementById('b-rules').onclick=()=>document.getElementById('m-rules').classList.add('on');
+document.getElementById('b-rules-ok').onclick=()=>document.getElementById('m-rules').classList.remove('on');
+
+drawBoard();drawDie(6);render();initRoom();
+})();
+</script>
+</body>
+</html>

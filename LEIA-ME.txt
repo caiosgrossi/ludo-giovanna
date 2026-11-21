@@ -1,0 +1,5 @@
+Ludo da Giovanna
+- index.html            : o site (carta + jogo)
+- config.js             : cole aqui o firebaseConfig (unico arquivo que voce edita)
+- regras-firebase.json  : regras para colar em Firebase > Realtime Database > Regras
+                          (NAO precisa subir este arquivo pro GitHub)
