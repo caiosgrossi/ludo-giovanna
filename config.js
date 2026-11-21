@@ -4,13 +4,13 @@
 //   Seus apps > Web)  Troque só os valores entre aspas.
 // ============================================================
 window.FIREBASE_CONFIG = {
-  apiKey: "COLE_AQUI",
-  authDomain: "COLE_AQUI",
-  databaseURL: "COLE_AQUI",
-  projectId: "COLE_AQUI",
-  storageBucket: "COLE_AQUI",
-  messagingSenderId: "COLE_AQUI",
-  appId: "COLE_AQUI"
+  apiKey: "AIzaSyAF1Cq88nicZOwRVsslnYCtBSmfJid40LM",
+  authDomain: "ludo-giovanna.firebaseapp.com",
+  databaseURL: "https://ludo-giovanna-default-rtdb.firebaseio.com",
+  projectId: "ludo-giovanna",
+  storageBucket: "ludo-giovanna.firebasestorage.app",
+  messagingSenderId: "365381779756",
+  appId: "1:365381779756:web:0a988ab5c759db5fe5ac89"
 };
 
 // Nome da sala do jogo (pode deixar assim).
